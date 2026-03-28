@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GardenMate - Prototype A</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,sans-serif;background:#e0e0e0;display:flex;justify-content:center;padding:20px 10px;min-height:100vh}
+  .phone{width:390px;max-width:100%;background:#fff;min-height:100vh;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.15)}
+
+  /* NAV - ICONS ONLY */
+  .nav{display:flex;background:#1B5E20;height:56px;position:sticky;top:0;z-index:100}
+  .nav-tab{flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;padding:0;border:none;background:transparent}
+  .nav-tab svg{width:26px;height:26px;stroke:rgba(255,255,255,.5);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .nav-tab.active{background:rgba(255,255,255,.15)}
+  .nav-tab.active svg{stroke:#fff}
+  .nav-tab.active::after{content:'';position:absolute;bottom:0;left:8px;right:8px;height:3px;background:#fff;border-radius:2px 2px 0 0}
+
+  .screen{display:none}.screen.active{display:block}
+  .page{display:none}.page.active-page{display:block}
+
+  /* Welcome */
+  .welcome{text-align:center;padding:50px 36px}
+  .welcome h1{font-size:32px;font-weight:700;color:#1B5E20;margin-bottom:6px}
+  .welcome .sub{font-size:16px;color:#888;margin-bottom:20px}
+  .welcome .hero{width:260px;height:260px;background:#E8F5E9;margin:0 auto 16px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:90px}
+  .welcome .tagline{font-size:15px;color:#555;margin-bottom:28px}
+  .btn-primary{display:block;width:310px;max-width:100%;margin:0 auto 14px;padding:16px;background:#2E7D32;color:#fff;border:none;border-radius:8px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn-primary:hover{background:#1B5E20}
+  .btn-outline{display:block;width:310px;max-width:100%;margin:0 auto 14px;padding:14px;background:#fff;color:#2E7D32;border:2px solid #2E7D32;border-radius:8px;font-size:18px;font-weight:700;cursor:pointer;font-family:inherit}
+  .footer-note{font-size:13px;color:#aaa;margin-top:24px}
+
+  /* Auth */
+  .auth-title{font-size:22px;font-weight:700;color:#1a1a1a;padding:24px 24px 16px}
+  .form-group{padding:0 24px;margin-bottom:16px}
+  .form-group label{display:block;font-size:14px;font-weight:700;color:#555;margin-bottom:5px}
+  .form-group input,.form-group textarea{width:100%;padding:13px 14px;border:2px solid #ddd;border-radius:8px;font-size:16px;font-family:inherit;outline:none}
+  .form-group input:focus,.form-group textarea:focus{border-color:#2E7D32}
+  .form-submit{margin:8px 24px 0}
+  .form-submit .btn-primary{width:100%}
+  .auth-link{text-align:center;padding:14px;font-size:14px;color:#888}
+  .auth-link a{color:#2E7D32;font-weight:700;cursor:pointer;text-decoration:underline}
+  .back-row{padding:12px 16px;cursor:pointer;font-size:15px;color:#2E7D32;font-weight:700}
+
+  /* Home */
+  .greeting{margin:14px;padding:14px 16px;background:#E8F5E9;border-radius:10px;border:1px solid #C8E6C9}
+  .greeting h2{font-size:17px;font-weight:700;color:#1B5E20}
+  .greeting p{font-size:13px;color:#555;margin-top:3px}
+  .section-label{font-size:13px;font-weight:700;color:#777;letter-spacing:1px;margin:18px 16px 10px;text-transform:uppercase}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
+  .tile{background:#F5F5F5;border-radius:10px;padding:12px;cursor:pointer;text-align:center;border:1.5px solid #E0E0E0}
+  .tile-img{width:100%;height:72px;border-radius:6px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:36px}
+  .tile h3{font-size:15px;font-weight:700;color:#333}
+  .tile p{font-size:13px;color:#777;margin-top:2px}
+  .tile .badge{display:inline-block;background:#2E7D32;color:#fff;font-size:12px;padding:2px 10px;border-radius:11px;margin-top:4px}
+
+  /* Post cards */
+  .post-card{margin:10px 16px;padding:14px;background:#F5F5F5;border-radius:10px;border:1.5px solid #E0E0E0}
+  .post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .post-avatar{width:42px;height:42px;border-radius:21px;background:#C8E6C9;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#2E7D32}
+  .post-name{font-size:15px;font-weight:700;color:#333}
+  .post-time{font-size:12px;color:#999;margin-top:1px}
+  .post-text{font-size:14px;color:#444;line-height:1.5;margin-bottom:10px}
+  .post-img{width:100%;height:150px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:56px}
+  .post-actions-row{display:flex;gap:16px;padding-top:8px;border-top:1px solid #e8e8e8}
+  .post-action{font-size:13px;color:#555;cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 0}
+
+  .load-more{display:block;margin:20px auto 30px;padding:12px 36px;background:#fff;border:2px solid #2E7D32;border-radius:26px;font-size:15px;font-weight:700;color:#2E7D32;cursor:pointer;font-family:inherit}
+
+  /* My Garden */
+  .reminders-strip{margin:14px;padding:14px;background:#E8F5E9;border-radius:10px;border:1px solid #C8E6C9;text-align:center}
+  .reminders-strip h3{font-size:13px;font-weight:700;color:#2E7D32;letter-spacing:1px;margin-bottom:10px}
+  .reminder-pills{display:flex;gap:8px;justify-content:center}
+  .reminder-pill{padding:8px 16px;background:#C8E6C9;border-radius:6px;font-size:14px;color:#1B5E20;font-weight:600}
+  .plants-grid{display:flex;flex-wrap:wrap;gap:12px;padding:0 16px}
+  .plant-card{width:108px;background:#F5F5F5;border-radius:10px;border:1.5px solid #E0E0E0;padding:10px;text-align:center;cursor:pointer;position:relative}
+  .plant-card-img{width:86px;height:64px;border-radius:6px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:32px}
+  .plant-card h4{font-size:14px;font-weight:700;color:#333}
+  .plant-badge{position:absolute;top:6px;right:6px;font-size:9px;color:#fff;padding:2px 7px;border-radius:8px;font-weight:600}
+  .add-plant-card{width:108px;min-height:108px;border:2px dashed #C8E6C9;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#2E7D32}
+  .add-plant-card .plus{font-size:30px;line-height:1}
+  .add-plant-card span{font-size:12px;margin-top:3px}
+
+  /* Plant detail */
+  .plant-detail{padding:16px}
+  .plant-detail-img{width:100%;height:190px;background:#E8F5E9;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:72px}
+  .detail-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #eee;font-size:14px}
+  .detail-label{color:#888}.detail-value{font-weight:700;color:#333}
+
+  /* Social */
+  .social-post{margin:10px 16px;padding:14px;background:#F5F5F5;border-radius:10px;border:1.5px solid #E0E0E0}
+  .social-post-img{width:100%;height:150px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;font-size:56px}
+  .social-actions{display:flex;gap:20px;margin-top:8px;padding-top:8px;border-top:1px solid #e8e8e8}
+  .social-action{font-size:13px;color:#555;cursor:pointer}
+
+  /* New post */
+  .new-post-page{padding:16px}
+  .new-post-page h2{font-size:22px;font-weight:700;color:#1a1a1a;margin-bottom:18px;text-align:center}
+  .new-post-page textarea{width:100%;padding:13px;border:2px solid #ddd;border-radius:8px;font-size:15px;font-family:inherit;resize:none;outline:none;min-height:110px}
+  .new-post-page textarea:focus{border-color:#2E7D32}
+  .photo-btns{display:flex;gap:10px;margin:12px 0}
+  .photo-btn{padding:10px 18px;border:1.5px solid #C8E6C9;border-radius:8px;background:#F5F5F5;font-size:14px;cursor:pointer;font-family:inherit;color:#2E7D32;font-weight:600}
+
+  /* Success */
+  .success-page{text-align:center;padding:60px 30px}
+  .success-page .check{width:80px;height:80px;border-radius:50%;background:#E8F5E9;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;font-size:40px;color:#2E7D32}
+  .success-page h2{font-size:22px;font-weight:700;color:#1B5E20;margin-bottom:8px}
+  .success-page p{font-size:15px;color:#777;margin-bottom:28px}
+
+  /* Help */
+  .help-page{padding:18px 16px}
+  .help-page h2{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:14px}
+  .help-item{padding:14px;background:#F5F5F5;border-radius:10px;border:1.5px solid #E0E0E0;margin-bottom:10px;cursor:pointer}
+  .help-item h3{font-size:15px;font-weight:700;color:#333}
+  .help-item p{font-size:13px;color:#777;margin-top:3px}
+
+  /* Profile */
+  .profile-section{padding:18px 16px;text-align:center}
+  .profile-pic{width:90px;height:90px;border-radius:50%;background:#C8E6C9;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:36px;color:#2E7D32;font-weight:700}
+  .profile-section h2{font-size:20px;font-weight:700;color:#1a1a1a}
+  .profile-tiles{display:flex;gap:12px;padding:0 16px;margin-bottom:14px}
+  .profile-tile{flex:1;background:#F5F5F5;border:1.5px solid #E0E0E0;border-radius:10px;padding:14px;text-align:center;cursor:pointer}
+  .profile-tile h3{font-size:15px;font-weight:700;color:#333}
+  .profile-tile p{font-size:13px;color:#777;margin-top:2px}
+  .bio-section{margin:0 16px;padding:14px;background:#F5F5F5;border-radius:10px;border:1.5px solid #E0E0E0}
+  .bio-section h4{font-size:14px;font-weight:700;color:#555;margin-bottom:6px}
+  .bio-section p{font-size:14px;color:#555;line-height:1.5}
+  .settings-list{margin:14px 16px}
+  .settings-item{padding:13px 0;border-bottom:1px solid #eee;font-size:15px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px}
+
+  .proto-tag{position:fixed;top:8px;right:8px;background:#1B5E20;color:#fff;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;z-index:999}
+  @media(max-width:420px){.phone{box-shadow:none}body{padding:0}}
+</style>
+</head>
+<body>
+<div class="proto-tag">Prototype A</div>
+<div class="phone" id="app">
+
+  <!-- WELCOME -->
+  <div class="screen active" id="s-welcome">
+    <div class="welcome">
+      <h1>GardenMate</h1>
+      <div class="sub">Your gardening companion</div>
+      <div class="hero">🌱</div>
+      <div class="tagline">Grow, share and flourish with your community</div>
+      <button class="btn-primary" onclick="go('s-signup')">Sign Up</button>
+      <button class="btn-outline" onclick="go('s-login')">Log In</button>
+      <div class="footer-note">Designed for gardeners 60+</div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="screen" id="s-login">
+    <div class="back-row" onclick="go('s-welcome')">&#8592; Back</div>
+    <div class="auth-title">Log In</div>
+    <div class="form-group"><label>Email or Phone</label><input type="text" placeholder="Enter your email or phone"></div>
+    <div class="form-group"><label>Password</label><input type="password" placeholder="Enter your password"></div>
+    <div class="form-submit"><button class="btn-primary" onclick="enterApp()">Log In</button></div>
+    <div class="auth-link">Don't have an account? <a onclick="go('s-signup')">Sign Up</a></div>
+  </div>
+
+  <!-- SIGNUP -->
+  <div class="screen" id="s-signup">
+    <div class="back-row" onclick="go('s-welcome')">&#8592; Back</div>
+    <div class="auth-title">Create Account</div>
+    <div class="form-group"><label>Full Name</label><input type="text" placeholder="Enter your name"></div>
+    <div class="form-group"><label>Email or Phone</label><input type="text" placeholder="Enter your email or phone"></div>
+    <div class="form-group"><label>Password</label><input type="password" placeholder="Create a password"></div>
+    <div class="form-submit"><button class="btn-primary" onclick="enterApp()">Create Account</button></div>
+    <div class="auth-link">Already have an account? <a onclick="go('s-login')">Log In</a></div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div class="screen" id="s-app">
+    <nav class="nav" id="topNav">
+      <button class="nav-tab active" data-page="home" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4"/></svg>
+      </button>
+      <button class="nav-tab" data-page="garden" onclick="switchTab('garden')">
+        <svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+      </button>
+      <button class="nav-tab" data-page="social" onclick="switchTab('social')">
+        <svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+      <button class="nav-tab" data-page="help" onclick="switchTab('help')">
+        <svg viewBox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </button>
+    </nav>
+
+    <!-- HOME -->
+    <div class="page active-page" id="p-home">
+      <div class="greeting"><h2>Good morning, Georgi 👋</h2><p>Here's what's happening in your garden today</p></div>
+      <div class="section-label">Quick Access</div>
+      <div class="tiles">
+        <div class="tile" onclick="switchTab('garden')"><div class="tile-img" style="background:#E8F5E9">🌿</div><h3>My Plants</h3><p>8 plants growing</p></div>
+        <div class="tile"><div class="tile-img" style="background:#FFF8E1">📋</div><h3>To-Do Today</h3><div class="badge">3 tasks</div></div>
+        <div class="tile" onclick="showSubpage('p-newpost')"><div class="tile-img" style="background:#E3F2FD">✏️</div><h3>Make a Post</h3><p>Share with friends</p></div>
+        <div class="tile" onclick="switchTab('social')"><div class="tile-img" style="background:#FCE4EC">👥</div><h3>Community</h3><p>12 new updates</p></div>
+      </div>
+      <div class="section-label">Community Feed</div>
+
+      <div class="post-card">
+        <div class="post-header"><div class="post-avatar">M</div><div><div class="post-name">Maria</div><div class="post-time">2 hours ago</div></div></div>
+        <div class="post-text">My tomatoes are finally turning red! After three months of care, I am so proud of them.</div>
+        <div class="post-img" style="background:#FFEBEE">🍅</div>
+        <div class="post-actions-row"><button class="post-action">❤️ 24</button><button class="post-action">💬 8</button><button class="post-action">🔖 Save</button></div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header"><div class="post-avatar">S</div><div><div class="post-name">Stefan</div><div class="post-time">5 hours ago</div></div></div>
+        <div class="post-text">Can anyone help? The leaves on my basil are turning yellow. I water it every day.</div>
+        <div class="post-img" style="background:#F1F8E9">🌿</div>
+        <div class="post-actions-row"><button class="post-action">❤️ 5</button><button class="post-action">💬 12</button><button class="post-action">🔖 Save</button></div>
+      </div>
+
+      <div class="post-card">
+        <div class="post-header"><div class="post-avatar">E</div><div><div class="post-name">Elena</div><div class="post-time">Yesterday</div></div></div>
+        <div class="post-text">Spring planting season is here! Just planted my first row of peppers. Wish me luck! 🌶️</div>
+        <div class="post-img" style="background:#FFF3E0">🌶️</div>
+        <div class="post-actions-row"><button class="post-action">❤️ 31</button><button class="post-action">💬 6</button><button class="post-action">🔖 Save</button></div>
+      </div>
+      <button class="load-more">Load More Posts</button>
+    </div>
+
+    <!-- MY GARDEN -->
+    <div class="page" id="p-garden">
+      <div class="reminders-strip">
+        <h3>TODAY'S REMINDERS</h3>
+        <div class="reminder-pills"><div class="reminder-pill">💧 Water Now</div><div class="reminder-pill">🍅 Harvest</div><div class="reminder-pill">💡 Tips</div></div>
+      </div>
+      <div class="section-label" style="display:flex;justify-content:space-between;align-items:center"><span>My Plants</span><span style="font-size:14px;color:#2E7D32;text-decoration:underline;font-weight:400;letter-spacing:0;text-transform:none;cursor:pointer">See All</span></div>
+      <div class="plants-grid">
+        <div class="plant-card" onclick="showSubpage('p-plantinfo')"><div class="plant-card-img" style="background:#FCE4EC">🌹</div><h4>Roses</h4><div class="plant-badge" style="background:#2E7D32">water</div></div>
+        <div class="plant-card"><div class="plant-card-img" style="background:#FFEBEE">🍅</div><h4>Tomatoes</h4><div class="plant-badge" style="background:#E65100">pick</div></div>
+        <div class="plant-card"><div class="plant-card-img" style="background:#E8F5E9">🌿</div><h4>Basil</h4></div>
+        <div class="plant-card"><div class="plant-card-img" style="background:#FFF3E0">🌶️</div><h4>Peppers</h4></div>
+        <div class="plant-card"><div class="plant-card-img" style="background:#EDE7F6">💐</div><h4>Lavender</h4></div>
+        <div class="add-plant-card"><div class="plus">+</div><span>Add Plant</span></div>
+      </div>
+      <div class="section-label">Garden Log</div>
+      <div class="post-card"><div class="post-text" style="margin:0;font-size:13px;color:#777">Watered all plants - 22 Mar</div></div>
+      <div class="post-card"><div class="post-text" style="margin:0;font-size:13px;color:#777">Added fertilizer to tomatoes - 20 Mar</div></div>
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- PLANT INFO -->
+    <div class="page" id="p-plantinfo">
+      <div class="back-row" onclick="switchTab('garden')">&#8592; Back to My Garden</div>
+      <div class="plant-detail">
+        <div class="plant-detail-img">🌹</div>
+        <h2 style="font-size:22px;font-weight:700;margin-bottom:14px">Roses</h2>
+        <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value" style="color:#E65100">Needs Water</span></div>
+        <div class="detail-row"><span class="detail-label">Last Watered</span><span class="detail-value">2 days ago</span></div>
+        <div class="detail-row"><span class="detail-label">Location</span><span class="detail-value">Front Garden</span></div>
+        <div class="detail-row"><span class="detail-label">Added</span><span class="detail-value">15 Mar 2026</span></div>
+        <button class="btn-primary" style="margin-top:18px">Mark as Watered</button>
+      </div>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="page" id="p-social">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 0">
+        <span class="section-label" style="margin:0">Social Feed</span>
+        <button class="btn-primary" style="width:auto;padding:10px 18px;font-size:14px;margin:0" onclick="showSubpage('p-newpost')">+ New Post</button>
+      </div>
+      <div class="social-post">
+        <div class="post-header"><div class="post-avatar">D</div><div><div class="post-name">Dimitar</div><div class="post-time">3 hours ago</div></div></div>
+        <div class="social-post-img" style="background:#E8F5E9">🏡</div>
+        <div class="post-text">Our village garden is looking great this spring! The orchard is in full bloom.</div>
+        <div class="social-actions"><span class="social-action">❤️ Like</span><span class="social-action">💬 Comment</span></div>
+      </div>
+      <div class="social-post">
+        <div class="post-header"><div class="post-avatar">P</div><div><div class="post-name">Penka</div><div class="post-time">Yesterday</div></div></div>
+        <div class="social-post-img" style="background:#FCE4EC">🌺</div>
+        <div class="post-text">My flower bed is the prettiest on the street! The neighbours are jealous.</div>
+        <div class="social-actions"><span class="social-action">❤️ Like</span><span class="social-action">💬 Comment</span></div>
+      </div>
+    </div>
+
+    <!-- NEW POST -->
+    <div class="page" id="p-newpost">
+      <div class="back-row" onclick="switchTab('social')">&#8592; Back</div>
+      <div class="new-post-page">
+        <h2>New Post</h2>
+        <label style="font-size:16px;font-weight:700;display:block;margin-bottom:6px">Post Title</label>
+        <input type="text" placeholder="Add a title for your post..." style="width:100%;padding:13px;border:2px solid #ddd;border-radius:8px;font-size:15px;font-family:inherit;outline:none;margin-bottom:14px">
+        <label style="font-size:16px;font-weight:700;display:block;margin-bottom:6px">Write Something</label>
+        <textarea placeholder="Write something about your post..."></textarea>
+        <div class="photo-btns"><div class="photo-btn">📷 Add Photo</div><div class="photo-btn">🌱 Tag Plants</div></div>
+        <button class="btn-primary" onclick="showSubpage('p-postcreated')">Publish</button>
+      </div>
+    </div>
+
+    <!-- POST CREATED -->
+    <div class="page" id="p-postcreated">
+      <div class="success-page">
+        <div class="check">✓</div>
+        <h2>New Post Created!</h2>
+        <p>Your post is now live for your community to see</p>
+        <button class="btn-primary" style="width:auto;padding:14px 36px;display:inline-block" onclick="switchTab('social')">Back to Social</button>
+      </div>
+    </div>
+
+    <!-- HELP -->
+    <div class="page" id="p-help">
+      <div class="help-page">
+        <h2>Help & Support</h2>
+        <div class="help-item"><h3>🌱 How do I add a plant?</h3><p>Learn how to add plants to your garden</p></div>
+        <div class="help-item"><h3>✏️ How do I make a post?</h3><p>Share your garden with the community</p></div>
+        <div class="help-item"><h3>🔔 How do reminders work?</h3><p>Set up watering and care reminders</p></div>
+        <div class="help-item"><h3>🔒 Privacy & Settings</h3><p>Manage your account and privacy</p></div>
+        <div class="help-item"><h3>📞 Contact Support</h3><p>Get help from our team</p></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="page" id="p-profile">
+      <div class="back-row" onclick="switchTab('home')">&#8592; Back</div>
+      <div class="profile-section">
+        <div class="profile-pic">G</div>
+        <h2>Georgi</h2>
+      </div>
+      <div class="profile-tiles">
+        <div class="profile-tile"><h3>My Posts</h3><p>12 posts</p></div>
+        <div class="profile-tile"><h3>My Friends</h3><p>8 friends</p></div>
+      </div>
+      <div class="bio-section"><h4>Bio</h4><p>Gardening enthusiast from Sofia. Love growing tomatoes, roses, and herbs.</p></div>
+      <div class="settings-list">
+        <div class="settings-item">⚙️ Edit Profile</div>
+        <div class="settings-item">🔔 Notification Settings</div>
+        <div class="settings-item">🔒 Privacy</div>
+        <div class="settings-item" style="color:#C62828">🚪 Log Out</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function enterApp(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s-app').classList.add('active');switchTab('home')}
+function switchTab(tab){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page'));var p=document.getElementById('p-'+tab);if(p)p.classList.add('active-page');document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.page===tab))}
+function showSubpage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page'));document.getElementById(id).classList.add('active-page');document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'))}
+</script>
+</body>
+</html>
